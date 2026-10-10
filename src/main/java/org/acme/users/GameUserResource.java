@@ -1,9 +1,13 @@
 package org.acme.users;
 
+import java.util.List;
+
 import org.acme.users.dto.CreateOwnedNinjaRequest;
 import org.acme.ninjas.dto.NinjaResponseDto;
 import org.acme.users.dto.GameUserPageResponseDto;
 import org.acme.users.dto.GameUserResponseDto;
+import org.acme.users.dto.DeliveryAddressRequest;
+import org.acme.users.dto.DeliveryAddressResponseDto;
 import org.acme.users.dto.RegisterUserRequest;
 import org.acme.users.dto.UpdateAccountLevelRequest;
 
@@ -50,6 +54,50 @@ public class GameUserResource {
   @RolesAllowed("ninja")
   public GameUserResponseDto me() {
     return service.getMe();
+  }
+
+  @GET
+  @Path("/me/delivery-addresses")
+  @RolesAllowed("ninja")
+  public List<DeliveryAddressResponseDto> deliveryAddresses() {
+    return service.listDeliveryAddresses();
+  }
+
+  @POST
+  @Path("/me/delivery-addresses")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @RolesAllowed("ninja")
+  public Response createDeliveryAddress(
+      @Valid DeliveryAddressRequest request, @Context UriInfo uriInfo) {
+    DeliveryAddressResponseDto address = service.createDeliveryAddress(request);
+    return Response.created(uriInfo.getAbsolutePathBuilder().path(address.id().toString()).build())
+        .entity(address)
+        .build();
+  }
+
+  @PUT
+  @Path("/me/delivery-addresses/{addressId}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @RolesAllowed("ninja")
+  public DeliveryAddressResponseDto updateDeliveryAddress(
+      @PathParam("addressId") long addressId, @Valid DeliveryAddressRequest request) {
+    return service.updateDeliveryAddress(addressId, request);
+  }
+
+  @PUT
+  @Path("/me/delivery-addresses/{addressId}/default")
+  @RolesAllowed("ninja")
+  public DeliveryAddressResponseDto setDefaultDeliveryAddress(
+      @PathParam("addressId") long addressId) {
+    return service.setDefaultDeliveryAddress(addressId);
+  }
+
+  @DELETE
+  @Path("/me/delivery-addresses/{addressId}")
+  @RolesAllowed("ninja")
+  public Response deleteDeliveryAddress(@PathParam("addressId") long addressId) {
+    service.deleteDeliveryAddress(addressId);
+    return Response.noContent().build();
   }
 
   @POST

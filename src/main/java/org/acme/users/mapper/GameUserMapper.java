@@ -7,6 +7,9 @@ import org.acme.ninjas.dto.NinjaResponseDto;
 import org.acme.ninjas.mapper.NinjaMapper;
 import org.acme.users.GameUserEntity;
 import org.acme.users.dto.CreateOwnedNinjaRequest;
+import org.acme.users.UserDeliveryAddressEntity;
+import org.acme.users.dto.DeliveryAddressRequest;
+import org.acme.users.dto.DeliveryAddressResponseDto;
 import org.acme.users.dto.GameUserResponseDto;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -39,5 +42,39 @@ public class GameUserMapper {
     ninja.setAge(request.age());
     ninja.setLevel(request.level());
     return ninja;
+  }
+
+  public void update(UserDeliveryAddressEntity address, DeliveryAddressRequest request) {
+    address.setLabel(request.label());
+    address.setRecipientName(request.recipientName());
+    address.setPhone(request.phone());
+    address.setStreet(request.street());
+    address.setNumber(request.number());
+    address.setComplement(request.complement());
+    address.setNeighborhood(request.neighborhood());
+    address.setCity(request.city());
+    address.setState(request.state());
+    address.setPostalCode(request.postalCode());
+    address.setCountry(request.country().toUpperCase(java.util.Locale.ROOT));
+    address.setDeliveryInstructions(request.deliveryInstructions());
+  }
+
+  public DeliveryAddressResponseDto toAddressResponse(UserDeliveryAddressEntity address) {
+    return new DeliveryAddressResponseDto(
+        address.getId(),
+        address.getLabel(),
+        address.getRecipientName(),
+        address.getPhone(),
+        address.getStreet(),
+        address.getNumber(),
+        address.getComplement(),
+        address.getNeighborhood(),
+        address.getCity(),
+        address.getState(),
+        address.getPostalCode(),
+        address.getCountry(),
+        address.getDeliveryInstructions(),
+        address.isDefaultAddress(),
+        address.getCreatedAt());
   }
 }

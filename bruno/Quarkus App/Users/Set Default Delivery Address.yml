@@ -1,0 +1,12 @@
+info:
+  name: Set Default Delivery Address
+  type: http
+  seq: 55
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/users/me/delivery-addresses/{{deliveryAddressId}}/default"
+  headers:
+    - name: Authorization
+      value: "******"
+  auth: inherit

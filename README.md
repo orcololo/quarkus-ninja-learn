@@ -35,6 +35,19 @@ You can run your application in dev mode that enables live coding using:
 
 > **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
 
+## Local observability
+
+The Micrometer/OpenTelemetry bridge exports application metrics, traces, and
+logs. In dev mode, Quarkus automatically starts the Grafana LGTM Dev Service
+(Loki, Grafana, Tempo, and Prometheus) when Docker or Podman is available. Its
+Grafana UI is available at <http://localhost:3000> while the application is
+running in dev mode. Quarkus prints the LGTM container startup details in the
+dev-mode output. No separately managed observability stack is required.
+
+This local stack is for development. For production, configure the OpenTelemetry
+OTLP exporter to point at your telemetry collector. The test profile disables
+the OpenTelemetry SDK so tests do not attempt to export to a local collector.
+
 Flyway applies versioned SQL migrations from `src/main/resources/db/migration`.
 The test profile cleans and recreates its schema at startup. Development mode
 preserves application data and applies only pending migrations.
@@ -94,6 +107,17 @@ change levels, or link/unlink existing Ninjas. `GET /users?page=0&size=20` retur
 to synthetic legacy accounts by migration V5 and must be linked by an
 administrator to a real account before that account can submit missions or
 read their points.
+
+Account owners manage their private delivery-address book at
+`GET/POST /users/me/delivery-addresses` and
+`PUT/DELETE /users/me/delivery-addresses/{addressId}`. Set a saved address as
+the default with `PUT /users/me/delivery-addresses/{addressId}/default`. An
+address stores its label, recipient, phone, street/number, optional complement,
+neighborhood, city, state, postal code, ISO 3166-1 alpha-2 country code, and
+optional delivery instructions. The first address becomes the default; deleting
+the default promotes the oldest remaining address. Address routes require the
+account owner's `ninja` role and never expose addresses through the admin account
+list.
 
 The Keycloak import does not update a realm that already exists. For an
 existing local realm, create a confidential `ninja-provisioner` client with

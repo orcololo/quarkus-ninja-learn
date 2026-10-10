@@ -38,6 +38,9 @@ public class GameUserEntity extends PanacheEntity {
   @OneToMany(mappedBy = "owner", cascade = CascadeType.PERSIST)
   private List<NinjaEntity> ninjas = new ArrayList<>();
 
+  @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+  private List<UserDeliveryAddressEntity> deliveryAddresses = new ArrayList<>();
+
   public Long getId() {
     return id;
   }

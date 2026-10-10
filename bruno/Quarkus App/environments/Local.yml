@@ -50,3 +50,6 @@ vars:
   - name: reindexJobId
     value: "1"
     type: string
+  - name: deliveryAddressId
+    value: "1"
+    type: string

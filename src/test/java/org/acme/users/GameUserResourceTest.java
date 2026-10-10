@@ -21,6 +21,9 @@ class GameUserResourceTest {
   @BeforeEach
   void createTestAccount() {
     QuarkusTransaction.requiringNew().run(() -> entityManager.createNativeQuery("""
+        delete from user_delivery_address where user_id = 765432101
+        """).executeUpdate());
+    QuarkusTransaction.requiringNew().run(() -> entityManager.createNativeQuery("""
         update NinjaEntity set owner_user_id = null where owner_user_id = 765432101
         """).executeUpdate());
     QuarkusTransaction.requiringNew().run(() -> entityManager.createNativeQuery("""
@@ -141,5 +144,163 @@ class GameUserResourceTest {
         .get("/users?page=0&size=101")
         .then()
         .statusCode(400);
+  }
+
+  @Test
+  @TestSecurity(user = "account-test-subject", roles = "ninja")
+  void accountCanManageAddressesAndDefaultMovesToOldestWhenDeleted() {
+    int firstId = given()
+        .contentType("application/json")
+        .body(validAddress("Home"))
+        .when()
+        .post("/users/me/delivery-addresses")
+        .then()
+        .statusCode(201)
+        .body("isDefault", equalTo(true))
+        .extract()
+        .path("id");
+
+    int secondId = given()
+        .contentType("application/json")
+        .body(validAddress("Work"))
+        .when()
+        .post("/users/me/delivery-addresses")
+        .then()
+        .statusCode(201)
+        .body("isDefault", equalTo(false))
+        .extract()
+        .path("id");
+
+    given()
+        .when()
+        .put("/users/me/delivery-addresses/{id}/default", secondId)
+        .then()
+        .statusCode(200)
+        .body("isDefault", equalTo(true));
+
+    given()
+        .contentType("application/json")
+        .body(validAddress("Office"))
+        .when()
+        .put("/users/me/delivery-addresses/{id}", secondId)
+        .then()
+        .statusCode(200)
+        .body("label", equalTo("Office"))
+        .body("phone", equalTo("+5511999999999"))
+        .body("isDefault", equalTo(true));
+
+    given()
+        .when()
+        .get("/users/me/delivery-addresses")
+        .then()
+        .statusCode(200)
+        .body("size()", equalTo(2))
+        .body("[0].id", equalTo(secondId))
+        .body("[0].country", equalTo("BR"));
+
+    given()
+        .when()
+        .delete("/users/me/delivery-addresses/{id}", secondId)
+        .then()
+        .statusCode(204);
+    given()
+        .when()
+        .get("/users/me/delivery-addresses")
+        .then()
+        .statusCode(200)
+        .body("size()", equalTo(1))
+        .body("[0].id", equalTo(firstId))
+        .body("[0].isDefault", equalTo(true));
+
+    given()
+        .contentType("application/json")
+        .body("""
+            {"label":"Invalid","recipientName":"Name","phone":"bad","street":"Rua A",
+             "number":"1","neighborhood":"Centro","city":"Sao Paulo","state":"SP",
+             "postalCode":"01000-000","country":"BR"}
+            """)
+        .when()
+        .post("/users/me/delivery-addresses")
+        .then()
+        .statusCode(400);
+  }
+
+  @Test
+  @TestSecurity(user = "other-account-subject", roles = "ninja")
+  void accountCannotReadOrModifyAnotherUsersDeliveryAddress() {
+    int addressId = QuarkusTransaction.requiringNew().call(() -> {
+      GameUserEntity owner = entityManager.find(GameUserEntity.class, USER_ID);
+      UserDeliveryAddressEntity address = new UserDeliveryAddressEntity();
+      address.setUser(owner);
+      address.setCreatedAt(java.time.Instant.now());
+      address.setLabel("Private");
+      address.setRecipientName("Account User");
+      address.setPhone("+5511999999999");
+      address.setStreet("Rua A");
+      address.setNumber("1");
+      address.setNeighborhood("Centro");
+      address.setCity("Sao Paulo");
+      address.setState("SP");
+      address.setPostalCode("01000-000");
+      address.setCountry("BR");
+      address.setDefaultAddress(true);
+      entityManager.persist(address);
+      entityManager.flush();
+      GameUserEntity otherUser = new GameUserEntity();
+      otherUser.setSubject("other-account-subject");
+      otherUser.setUsername("other-account");
+      otherUser.setEmail("other-account@example.invalid");
+      otherUser.setLevel(AccountLevel.BASIC);
+      entityManager.persist(otherUser);
+      entityManager.flush();
+      return address.getId().intValue();
+    });
+
+    given()
+        .when()
+        .get("/users/me/delivery-addresses")
+        .then()
+        .statusCode(200)
+        .body("size()", equalTo(0));
+    given()
+        .when()
+        .delete("/users/me/delivery-addresses/{id}", addressId)
+        .then()
+        .statusCode(404);
+    given()
+        .contentType("application/json")
+        .body(validAddress("Attempted update"))
+        .when()
+        .put("/users/me/delivery-addresses/{id}", addressId)
+        .then()
+        .statusCode(404);
+  }
+
+  @Test
+  void deliveryAddressesRequireAuthentication() {
+    given()
+        .when()
+        .get("/users/me/delivery-addresses")
+        .then()
+        .statusCode(401);
+  }
+
+  private String validAddress(String label) {
+    return """
+        {
+          "label":"%s",
+          "recipientName":"Account User",
+          "phone":"+5511999999999",
+          "street":"Rua das Flores",
+          "number":"123",
+          "complement":"Apto 42",
+          "neighborhood":"Centro",
+          "city":"Sao Paulo",
+          "state":"SP",
+          "postalCode":"01000-000",
+          "country":"br",
+          "deliveryInstructions":"Interfone 42"
+        }
+        """.formatted(label);
   }
 }

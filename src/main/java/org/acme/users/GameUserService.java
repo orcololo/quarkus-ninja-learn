@@ -10,6 +10,8 @@ import org.acme.ninjas.NinjaRepository;
 import org.acme.ninjas.dto.NinjaResponseDto;
 import org.acme.ninjas.mapper.NinjaMapper;
 import org.acme.users.dto.CreateOwnedNinjaRequest;
+import org.acme.users.dto.DeliveryAddressRequest;
+import org.acme.users.dto.DeliveryAddressResponseDto;
 import org.acme.users.dto.GameUserPageResponseDto;
 import org.acme.users.dto.GameUserResponseDto;
 import org.acme.users.dto.RegisterUserRequest;
@@ -21,6 +23,7 @@ import io.quarkus.panache.common.Page;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.LockModeType;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotFoundException;
@@ -35,6 +38,8 @@ public class GameUserService {
   private final GameUserMapper mapper;
   private final KeycloakProvisioner keycloak;
   private final SecurityIdentity identity;
+  private final UserDeliveryAddressRepository deliveryAddresses;
+  private final EntityManager entityManager;
 
   GameUserService(
       GameUserRepository userRepository,
@@ -42,13 +47,17 @@ public class GameUserService {
       NinjaMapper ninjaMapper,
       GameUserMapper mapper,
       KeycloakProvisioner keycloak,
-      SecurityIdentity identity) {
+      SecurityIdentity identity,
+      UserDeliveryAddressRepository deliveryAddresses,
+      EntityManager entityManager) {
     this.userRepository = userRepository;
     this.ninjaRepository = ninjaRepository;
     this.ninjaMapper = ninjaMapper;
     this.mapper = mapper;
     this.keycloak = keycloak;
     this.identity = identity;
+    this.deliveryAddresses = deliveryAddresses;
+    this.entityManager = entityManager;
   }
 
   public GameUserResponseDto register(RegisterUserRequest request) {
@@ -81,6 +90,67 @@ public class GameUserService {
 
   public GameUserResponseDto getMe() {
     return mapper.toResponse(currentUser());
+  }
+
+  public List<DeliveryAddressResponseDto> listDeliveryAddresses() {
+    GameUserEntity user = currentUser();
+    return deliveryAddresses.listForUser(user).stream()
+        .map(mapper::toAddressResponse)
+        .toList();
+  }
+
+  @Transactional
+  public DeliveryAddressResponseDto createDeliveryAddress(DeliveryAddressRequest request) {
+    GameUserEntity user = lockUser(currentUser().getId());
+    UserDeliveryAddressEntity address = new UserDeliveryAddressEntity();
+    address.setUser(user);
+    address.setCreatedAt(java.time.Instant.now());
+    mapper.update(address, request);
+    address.setDefaultAddress(deliveryAddresses.count("user", user) == 0);
+    deliveryAddresses.persistAndFlush(address);
+    return mapper.toAddressResponse(address);
+  }
+
+  @Transactional
+  public DeliveryAddressResponseDto updateDeliveryAddress(
+      long addressId, DeliveryAddressRequest request) {
+    GameUserEntity user = lockUser(currentUser().getId());
+    UserDeliveryAddressEntity address = findDeliveryAddress(user, addressId);
+    mapper.update(address, request);
+    return mapper.toAddressResponse(address);
+  }
+
+  @Transactional
+  public void deleteDeliveryAddress(long addressId) {
+    GameUserEntity user = lockUser(currentUser().getId());
+    UserDeliveryAddressEntity address = findDeliveryAddress(user, addressId);
+    boolean wasDefault = address.isDefaultAddress();
+    deliveryAddresses.delete(address);
+    entityManager.flush();
+    if (wasDefault) {
+      UserDeliveryAddressEntity nextDefault = deliveryAddresses
+          .find("user = ?1 order by createdAt, id", user)
+          .firstResult();
+      if (nextDefault != null) {
+        nextDefault.setDefaultAddress(true);
+      }
+    }
+  }
+
+  @Transactional
+  public DeliveryAddressResponseDto setDefaultDeliveryAddress(long addressId) {
+    GameUserEntity user = lockUser(currentUser().getId());
+    UserDeliveryAddressEntity address = findDeliveryAddress(user, addressId);
+    if (!address.isDefaultAddress()) {
+      UserDeliveryAddressEntity previousDefault =
+          deliveryAddresses.find("user = ?1 and defaultAddress = true", user).firstResult();
+      if (previousDefault != null) {
+        previousDefault.setDefaultAddress(false);
+        entityManager.flush();
+      }
+      address.setDefaultAddress(true);
+    }
+    return mapper.toAddressResponse(address);
   }
 
   public GameUserPageResponseDto list(int page, int size) {
@@ -157,6 +227,14 @@ public class GameUserService {
       throw new ForbiddenException("No game account is linked to this identity");
     }
     return user;
+  }
+
+  private UserDeliveryAddressEntity findDeliveryAddress(GameUserEntity user, long addressId) {
+    UserDeliveryAddressEntity address = deliveryAddresses.findForUser(user, addressId);
+    if (address == null) {
+      throw new NotFoundException("Delivery address not found: " + addressId);
+    }
+    return address;
   }
 
   private GameUserEntity lockUser(Long id) {

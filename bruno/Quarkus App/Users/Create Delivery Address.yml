@@ -1,0 +1,31 @@
+info:
+  name: Create Delivery Address
+  type: http
+  seq: 53
+
+http:
+  method: POST
+  url: "{{baseUrl}}/users/me/delivery-addresses"
+  headers:
+    - name: Authorization
+      value: "******"
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "label": "Home",
+        "recipientName": "Example Recipient",
+        "phone": "+5511999999999",
+        "street": "Rua das Flores",
+        "number": "123",
+        "complement": "Apto 42",
+        "neighborhood": "Centro",
+        "city": "Sao Paulo",
+        "state": "SP",
+        "postalCode": "01000-000",
+        "country": "BR",
+        "deliveryInstructions": "Interfone 42"
+      }
+  auth: inherit
