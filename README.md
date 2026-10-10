@@ -6,7 +6,7 @@ If you want to learn more about Quarkus, please visit its website: <https://quar
 
 ## Running the application in dev mode
 
-Start the local Keycloak server first:
+Start the local Keycloak and Elasticsearch services:
 
 ```shell
 docker compose up -d
@@ -24,6 +24,8 @@ and the `keycloak_db_data` volume, independent of the application's database.
 `docker compose down` preserves this data; `docker compose down -v` deletes it.
 The realm file is imported only when the realm does not already exist, so
 changing it after the first startup does not update the persisted realm.
+Elasticsearch is available at `http://localhost:9200`. The local Compose
+configuration disables Elasticsearch security and is for development only.
 
 You can run your application in dev mode that enables live coding using:
 
@@ -103,6 +105,38 @@ Production must also configure the application's PostgreSQL database with
 `KEYCLOAK_PROVISIONER_CLIENT_SECRET` for the Keycloak service account with
 permission to manage users. The PostgreSQL service in Compose is reserved for
 Keycloak and is not the application's database.
+
+## Restaurant locator
+
+Restaurants and reviews are stored in PostgreSQL. Restaurant create, update,
+delete, and review writes also add a search-indexing event in the same database
+transaction. A scheduled backend worker sends events to Elasticsearch in bulk,
+without holding a database transaction during network calls; failed batches
+remain queued for retry. Reindexing queues restaurants in bounded database
+pages. Search criteria, including coordinates and radius in kilometers, are
+sent to Elasticsearch by the backend; results are then loaded from PostgreSQL,
+which remains the source of truth. Restaurant search keeps exact result totals,
+so broad searches still require Elasticsearch to count every match.
+
+For the full API, data model, indexing/retry behavior, configuration, and test
+guide, see the [restaurant locator documentation](docs/restaurant-locator.md).
+
+Start Elasticsearch with `docker compose up -d elasticsearch` and configure
+`ELASTICSEARCH_URL` and `ELASTICSEARCH_API_KEY` in production. Restaurant
+management and reindexing require `mission-admin`; search, restaurant reads, and
+review reads are public. Any authenticated OIDC identity can submit one review
+per restaurant. Use `POST /restaurants/reindex` to queue current restaurants
+for indexing again.
+
+The restaurant integration tests start Elasticsearch 8.17.4 with Testcontainers;
+Docker must be available when running `./mvnw test`. The first run downloads the
+Elasticsearch image.
+
+The API supports `POST /restaurants`, `GET/PUT/DELETE /restaurants/{id}`,
+and `GET /restaurants/search?q=...&city=...&cuisine=...&latitude=...&longitude=...&radiusKm=...`.
+The search page uses `page` and `size` (maximum size 100). Create reviews with
+`POST /restaurants/{id}/reviews` using a 1-5 `rating` and optional `comment`;
+read reviews with `GET /restaurants/{id}/reviews`.
 
 ## Packaging and running the application
 

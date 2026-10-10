@@ -1,0 +1,8 @@
+info:
+  name: Search Restaurants
+  type: http
+  seq: 37
+
+http:
+  method: GET
+  url: "{{baseUrl}}/restaurants/search?q=ramen&city=San%20Francisco&latitude=37.7936&longitude=-122.3965&radiusKm=10&page=0&size=20"

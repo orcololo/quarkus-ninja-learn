@@ -1,0 +1,30 @@
+info:
+  name: Create Review
+  type: http
+  seq: 41
+
+http:
+  method: POST
+  url: "{{baseUrl}}/restaurants/{{restaurantId}}/reviews"
+  headers:
+    - name: Authorization
+      value: "******"
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "rating": 5,
+        "comment": "Excellent ramen and friendly service."
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status !== 201 || typeof res.body?.id !== "number") {
+          throw new Error(`Review creation failed (${res.status})`);
+        }
+        bru.setEnvVar("reviewId", String(res.body.id));

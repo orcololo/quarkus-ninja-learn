@@ -1,0 +1,8 @@
+info:
+  name: Get Restaurant
+  type: http
+  seq: 38
+
+http:
+  method: GET
+  url: "{{baseUrl}}/restaurants/{{restaurantId}}"

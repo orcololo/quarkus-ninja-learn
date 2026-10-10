@@ -1,0 +1,12 @@
+info:
+  name: Delete Restaurant
+  type: http
+  seq: 40
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/restaurants/{{restaurantId}}"
+  headers:
+    - name: Authorization
+      value: "******"
+  auth: inherit

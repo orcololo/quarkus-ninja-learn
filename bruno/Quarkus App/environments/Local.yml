@@ -38,3 +38,9 @@ vars:
   - name: ninjaId
     value: "1"
     type: string
+  - name: restaurantId
+    value: "1"
+    type: string
+  - name: reviewId
+    value: "1"
+    type: string

@@ -8,8 +8,9 @@ is needed. Bruno keeps script-set values for the current session; after
 restarting Bruno or when a token expires, run the matching token request again.
 These sample logins are for local development only.
 
-Requests are grouped into `Authentication`, `Users`, `Ninjas`, `Villages`, and
-`Missions` folders. The environment files remain at the collection root.
+Requests are grouped into `Authentication`, `Users`, `Ninjas`, `Villages`,
+`Missions`, and `Restaurants` folders. The environment files remain at the
+collection root.
 
 `mission-admin` is required for `Create Ninja` and all village changes.
 Village and Ninja read endpoints are public. Use `ninjaToken` for the points
@@ -40,3 +41,10 @@ the updated import, configure the confidential `ninja-provisioner` client
 with service accounts enabled, secret `local-provisioner-secret` for local
 development, and the `manage-users` and `view-realm` roles from `realm-management`.
 Updating the import JSON does not change an existing realm.
+
+Restaurant management and reindexing require `mission-admin`. Search and
+restaurant/review reads are public; creating a review requires an authenticated
+identity. Run `Create Restaurant` first to save its returned ID as
+`restaurantId`. Restaurant indexing is asynchronous, so search may briefly lag
+after writes. Run `Get Ninja Token` before `Create Review`; the create request
+saves its returned ID as `reviewId` for `Get Review`.

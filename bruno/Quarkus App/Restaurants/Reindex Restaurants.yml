@@ -1,0 +1,12 @@
+info:
+  name: Reindex Restaurants
+  type: http
+  seq: 44
+
+http:
+  method: POST
+  url: "{{baseUrl}}/restaurants/reindex"
+  headers:
+    - name: Authorization
+      value: "******"
+  auth: inherit

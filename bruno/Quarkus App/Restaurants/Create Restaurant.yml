@@ -1,0 +1,35 @@
+info:
+  name: Create Restaurant
+  type: http
+  seq: 36
+
+http:
+  method: POST
+  url: "{{baseUrl}}/restaurants"
+  headers:
+    - name: Authorization
+      value: "******"
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Sakura Ramen",
+        "description": "Ramen and Japanese comfort food",
+        "address": "1 Market Street",
+        "city": "San Francisco",
+        "cuisine": "Japanese",
+        "latitude": 37.7936,
+        "longitude": -122.3965
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status !== 201 || typeof res.body?.id !== "number") {
+          throw new Error(`Restaurant creation failed (${res.status})`);
+        }
+        bru.setEnvVar("restaurantId", String(res.body.id));

@@ -1,0 +1,8 @@
+info:
+  name: List Reviews
+  type: http
+  seq: 42
+
+http:
+  method: GET
+  url: "{{baseUrl}}/restaurants/{{restaurantId}}/reviews?page=0&size=20"

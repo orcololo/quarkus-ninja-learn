@@ -1,0 +1,26 @@
+info:
+  name: Update Restaurant
+  type: http
+  seq: 39
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/restaurants/{{restaurantId}}"
+  headers:
+    - name: Authorization
+      value: "******"
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Sakura Ramen",
+        "description": "Ramen and Japanese comfort food",
+        "address": "1 Market Street",
+        "city": "San Francisco",
+        "cuisine": "Japanese",
+        "latitude": 37.7936,
+        "longitude": -122.3965
+      }
+  auth: inherit
