@@ -5,5 +5,5 @@ info:
 
 http:
   method: GET
-  url: "{{baseUrl}}/missions"
+  url: "{{baseUrl}}/missions?page=0&size=20"
   auth: inherit

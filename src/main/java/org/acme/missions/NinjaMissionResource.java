@@ -1,15 +1,18 @@
 package org.acme.missions;
 
-import java.util.List;
-
+import org.acme.dto.PageResponseDto;
 import org.acme.missions.dto.NinjaMissionResponseDto;
 import org.acme.missions.dto.PointTransactionResponseDto;
 
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
@@ -25,8 +28,10 @@ public class NinjaMissionResource {
   @GET
   @Path("/submitted")
   @RolesAllowed("mission-admin")
-  public List<NinjaMissionResponseDto> listSubmitted() {
-    return ninjaMissionService.listSubmitted();
+  public PageResponseDto<NinjaMissionResponseDto> listSubmitted(
+      @QueryParam("page") @DefaultValue("0") @Min(0) @Max(1_000_000) int page,
+      @QueryParam("size") @DefaultValue("20") @Min(1) @Max(100) int size) {
+    return ninjaMissionService.listSubmitted(page, size);
   }
 
   @GET

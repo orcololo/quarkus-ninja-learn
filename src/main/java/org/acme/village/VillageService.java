@@ -2,6 +2,7 @@ package org.acme.village;
 
 import java.util.List;
 
+import org.acme.dto.PageResponseDto;
 import org.acme.ninjas.NinjaEntity;
 import org.acme.ninjas.NinjaRepository;
 import org.acme.ninjas.dto.NinjaResponseDto;
@@ -53,10 +54,11 @@ public class VillageService {
     return villageMapper.toResponse(village);
   }
 
-  public List<VillageResponseDto> getAllVillages() {
-    return villageRepository.listAll().stream()
+  public PageResponseDto<VillageResponseDto> getAllVillages(int page, int size) {
+    List<VillageResponseDto> items = villageRepository.listPage(page, size).stream()
         .map(villageMapper::toResponse)
         .toList();
+    return new PageResponseDto<>(items, page, size, villageRepository.count());
   }
 
   public VillageResponseDto getVillage(Long id) {
@@ -100,11 +102,16 @@ public class VillageService {
     return villageMapper.toResponse(village);
   }
 
-  public List<NinjaResponseDto> getNinjas(Long villageId) {
+  public PageResponseDto<NinjaResponseDto> getNinjas(Long villageId, int page, int size) {
     VillageEntity village = findVillage(villageId);
-    return ninjaRepository.list("village", village).stream()
+    List<NinjaResponseDto> items = ninjaRepository.find("village = ?1 order by id", village)
+        .page(io.quarkus.panache.common.Page.of(page, size))
+        .list()
+        .stream()
         .map(ninjaMapper::toResponse)
         .toList();
+    long total = ninjaRepository.count("village", village);
+    return new PageResponseDto<>(items, page, size, total);
   }
 
   @Transactional

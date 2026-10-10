@@ -1,17 +1,20 @@
 package org.acme.ninjas;
 
-import java.util.List;
-
+import org.acme.dto.PageResponseDto;
 import org.acme.ninjas.dto.CreateNinjaRequest;
 import org.acme.ninjas.dto.NinjaResponseDto;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
@@ -40,8 +43,10 @@ public class NinjaResource {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  public List<NinjaResponseDto> getAllNinjas() {
-    return ninjaService.getAllNinjas();
+  public PageResponseDto<NinjaResponseDto> getAllNinjas(
+      @QueryParam("page") @DefaultValue("0") @Min(0) @Max(1_000_000) int page,
+      @QueryParam("size") @DefaultValue("20") @Min(1) @Max(100) int size) {
+    return ninjaService.getAllNinjas(page, size);
   }
 
   @GET

@@ -59,8 +59,10 @@ class NinjaResourceTest {
         .get("/ninjas")
         .then()
         .statusCode(200)
-        .body("find { it.name == 'DTO Test Ninja' }.id", notNullValue())
-        .body("find { it.name == 'DTO Test Ninja' }.village.name", equalTo("Hidden Leaf Village"));
+        .body("items.find { it.name == 'DTO Test Ninja' }.id", notNullValue())
+        .body("items.find { it.name == 'DTO Test Ninja' }.village.name", equalTo("Hidden Leaf Village"))
+        .body("page", equalTo(0))
+        .body("size", equalTo(20));
 
     entityManager.clear();
     VillageEntity updatedVillage = entityManager.find(VillageEntity.class, 1L);
@@ -127,5 +129,15 @@ class NinjaResourceTest {
         .get("/ninjas/999999")
         .then()
         .statusCode(404);
+  }
+
+  @Test
+  void rejectsOutOfRangeNinjaListPagination() {
+    given()
+        .queryParam("size", 101)
+        .when()
+        .get("/ninjas")
+        .then()
+        .statusCode(400);
   }
 }

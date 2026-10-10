@@ -7,13 +7,16 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
 @ApplicationScoped
 public class KeycloakProvisioner {
-  private final KeycloakProvisioningClient client;
+  @Inject
+  @RestClient
+  KeycloakProvisioningClient client;
 
   @ConfigProperty(name = "keycloak.realm")
   String realm;
@@ -24,7 +27,11 @@ public class KeycloakProvisioner {
   @ConfigProperty(name = "keycloak.provisioner.client-secret")
   String clientSecret;
 
-  KeycloakProvisioner(@RestClient KeycloakProvisioningClient client) {
+  @Inject
+  KeycloakProvisioner() {
+  }
+
+  KeycloakProvisioner(KeycloakProvisioningClient client) {
     this.client = client;
   }
 
@@ -107,7 +114,7 @@ public class KeycloakProvisioner {
 
   private String findUserId(String username, String token) {
     return client.findUsers(realm, "Bearer " + token, username, true).stream()
-        .map(KeycloakProvisioningClient.KeycloakUserReference::id)
+        .map(user -> user.id())
         .filter(id -> id != null && !id.isBlank())
         .findFirst()
         .orElse(null);

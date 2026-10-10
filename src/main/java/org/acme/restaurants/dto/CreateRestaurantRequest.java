@@ -1,5 +1,7 @@
 package org.acme.restaurants.dto;
 
+import org.acme.restaurants.CuisineType;
+
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -11,7 +13,8 @@ public record CreateRestaurantRequest(
     @Size(max = 2000) String description,
     @NotBlank @Size(max = 255) String address,
     @NotBlank @Size(max = 120) String city,
-    @NotBlank @Size(max = 100) String cuisine,
+    @NotNull CuisineType cuisine,
     @NotNull @DecimalMin("-90.0") @DecimalMax("90.0") Double latitude,
-    @NotNull @DecimalMin("-180.0") @DecimalMax("180.0") Double longitude) {
+    @NotNull @DecimalMin("-180.0") @DecimalMax("180.0") Double longitude,
+    @jakarta.validation.Valid OpeningHoursDto openingHours) {
 }

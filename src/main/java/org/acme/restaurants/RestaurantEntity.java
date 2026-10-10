@@ -3,6 +3,8 @@ package org.acme.restaurants;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 
 @Entity
@@ -21,7 +23,8 @@ public class RestaurantEntity extends PanacheEntity {
   private String city;
 
   @Column(nullable = false, length = 100)
-  private String cuisine;
+  @Enumerated(EnumType.STRING)
+  private CuisineType cuisine;
 
   @Column(nullable = false)
   private double latitude;
@@ -34,6 +37,12 @@ public class RestaurantEntity extends PanacheEntity {
 
   @Column(name = "review_count", nullable = false)
   private long reviewCount;
+
+  @Column(name = "time_zone", length = 64)
+  private String timeZone;
+
+  @Column(name = "owner_subject", length = 255)
+  private String ownerSubject;
 
   public Long getId() {
     return id;
@@ -71,11 +80,11 @@ public class RestaurantEntity extends PanacheEntity {
     this.city = city;
   }
 
-  public String getCuisine() {
+  public CuisineType getCuisine() {
     return cuisine;
   }
 
-  public void setCuisine(String cuisine) {
+  public void setCuisine(CuisineType cuisine) {
     this.cuisine = cuisine;
   }
 
@@ -101,5 +110,21 @@ public class RestaurantEntity extends PanacheEntity {
 
   public long getReviewCount() {
     return reviewCount;
+  }
+
+  public String getTimeZone() {
+    return timeZone;
+  }
+
+  public void setTimeZone(String timeZone) {
+    this.timeZone = timeZone;
+  }
+
+  public String getOwnerSubject() {
+    return ownerSubject;
+  }
+
+  public void setOwnerSubject(String ownerSubject) {
+    this.ownerSubject = ownerSubject;
   }
 }

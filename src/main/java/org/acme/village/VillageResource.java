@@ -1,7 +1,6 @@
 package org.acme.village;
 
-import java.util.List;
-
+import org.acme.dto.PageResponseDto;
 import org.acme.ninjas.dto.NinjaResponseDto;
 import org.acme.village.dto.AssignVillageLeaderRequest;
 import org.acme.village.dto.CreateVillageRequest;
@@ -10,12 +9,16 @@ import org.acme.village.dto.VillageResponseDto;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
@@ -45,8 +48,10 @@ public class VillageResource {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  public List<VillageResponseDto> getAllVillages() {
-    return villageService.getAllVillages();
+  public PageResponseDto<VillageResponseDto> getAllVillages(
+      @QueryParam("page") @DefaultValue("0") @Min(0) @Max(1_000_000) int page,
+      @QueryParam("size") @DefaultValue("20") @Min(1) @Max(100) int size) {
+    return villageService.getAllVillages(page, size);
   }
 
   @GET
@@ -95,8 +100,11 @@ public class VillageResource {
   @GET
   @Path("/{id}/ninjas")
   @Produces(MediaType.APPLICATION_JSON)
-  public List<NinjaResponseDto> getNinjas(@PathParam("id") Long id) {
-    return villageService.getNinjas(id);
+  public PageResponseDto<NinjaResponseDto> getNinjas(
+      @PathParam("id") Long id,
+      @QueryParam("page") @DefaultValue("0") @Min(0) @Max(1_000_000) int page,
+      @QueryParam("size") @DefaultValue("20") @Min(1) @Max(100) int size) {
+    return villageService.getNinjas(id, page, size);
   }
 
   @PUT

@@ -42,9 +42,17 @@ with service accounts enabled, secret `local-provisioner-secret` for local
 development, and the `manage-users` and `view-realm` roles from `realm-management`.
 Updating the import JSON does not change an existing realm.
 
-Restaurant management and reindexing require `mission-admin`. Search and
+Restaurant management and reindexing require `mission-admin`. Reindexing now
+returns a job `id`; set `reindexJobId` to that value and poll `Get Reindex
+Status` to see how many restaurants and menu items have been queued and whether
+the scan is complete. Collection
+read requests accept `page` and `size` and return an `items` page envelope.
+Search and
 restaurant/review reads are public; creating a review requires an authenticated
 identity. Run `Create Restaurant` first to save its returned ID as
 `restaurantId`. Restaurant indexing is asynchronous, so search may briefly lag
 after writes. Run `Get Ninja Token` before `Create Review`; the create request
-saves its returned ID as `reviewId` for `Get Review`.
+saves its returned ID as `reviewId` for `Get Review`. Menu reads are public;
+menu item create/update/delete requests use `mission-admin`. Create a menu item
+to populate `menuItemId` for the item get/update/delete requests. `Search Menu
+Items` uses Elasticsearch and returns matching items with restaurant metadata.

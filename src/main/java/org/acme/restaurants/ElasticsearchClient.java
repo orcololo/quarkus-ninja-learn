@@ -26,6 +26,11 @@ public interface ElasticsearchClient {
   @Consumes(MediaType.APPLICATION_JSON)
   Response createIndex(@PathParam("index") String index, String mapping);
 
+  @PUT
+  @Path("/{index}/_mapping")
+  @Consumes(MediaType.APPLICATION_JSON)
+  Response updateMapping(@PathParam("index") String index, String mapping);
+
   @POST
   @Path("/{index}/_bulk")
   @Consumes("application/x-ndjson")

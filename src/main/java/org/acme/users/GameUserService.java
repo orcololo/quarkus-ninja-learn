@@ -89,7 +89,7 @@ public class GameUserService {
         .list();
     Map<Long, List<NinjaResponseDto>> ninjasByOwner = new HashMap<>();
     if (!users.isEmpty()) {
-      List<Long> userIds = users.stream().map(GameUserEntity::getId).toList();
+      List<Long> userIds = users.stream().map(user -> user.getId()).toList();
       for (NinjaEntity ninja : ninjaRepository.find("owner.id in ?1", userIds).list()) {
         ninjasByOwner.computeIfAbsent(ninja.getOwner().getId(), ignored -> new ArrayList<>())
             .add(ninjaMapper.toResponse(ninja));

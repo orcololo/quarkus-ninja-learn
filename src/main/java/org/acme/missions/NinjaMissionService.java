@@ -3,6 +3,7 @@ package org.acme.missions;
 import java.time.Instant;
 import java.util.List;
 
+import org.acme.dto.PageResponseDto;
 import org.acme.missions.dto.NinjaMissionResponseDto;
 import org.acme.missions.dto.PointBalanceResponseDto;
 import org.acme.missions.dto.PointTransactionResponseDto;
@@ -126,10 +127,12 @@ public class NinjaMissionService {
     return missionMapper.toResponse(assignment);
   }
 
-  public List<NinjaMissionResponseDto> listSubmitted() {
-    return assignmentRepository.list("status", NinjaMissionStatus.SUBMITTED).stream()
+  public PageResponseDto<NinjaMissionResponseDto> listSubmitted(int page, int size) {
+    List<NinjaMissionResponseDto> items = assignmentRepository.listSubmittedPage(page, size).stream()
         .map(missionMapper::toResponse)
         .toList();
+    long total = assignmentRepository.count("status", NinjaMissionStatus.SUBMITTED);
+    return new PageResponseDto<>(items, page, size, total);
   }
 
   public NinjaMissionResponseDto get(Long assignmentId) {

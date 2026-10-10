@@ -14,6 +14,16 @@ import static org.hamcrest.Matchers.notNullValue;
 @TestSecurity(user = "mission-admin", roles = "mission-admin")
 class VillageResourceTest {
   @Test
+  void rejectsOutOfRangeVillagePagination() {
+    given()
+        .queryParam("page", -1)
+        .when()
+        .get("/villages")
+        .then()
+        .statusCode(400);
+  }
+
+  @Test
   void createsListsAndGetsVillage() {
     String location = given()
         .contentType("application/json")
@@ -48,7 +58,10 @@ class VillageResourceTest {
         .get("/villages")
         .then()
         .statusCode(200)
-        .body("find { it.name == 'Test Village' }.id", notNullValue());
+        .body("items.find { it.name == 'Test Village' }.id", notNullValue())
+        .body("page", equalTo(0))
+        .body("size", equalTo(20))
+        .body("total", org.hamcrest.Matchers.greaterThan(0));
   }
 
   @Test
@@ -214,8 +227,9 @@ class VillageResourceTest {
         .get("/villages/{id}/ninjas", villageId)
         .then()
         .statusCode(200)
-        .body("$", hasSize(1))
-        .body("[0].id", equalTo(ninjaId));
+        .body("items", hasSize(1))
+        .body("items[0].id", equalTo(ninjaId))
+        .body("total", equalTo(1));
   }
 
   @Test
@@ -236,7 +250,15 @@ class VillageResourceTest {
         .get("/villages/{id}/ninjas", firstVillageId)
         .then()
         .statusCode(200)
-        .body("$", hasSize(1));
+        .body("items", hasSize(1))
+        .body("total", equalTo(1));
+
+    given()
+        .queryParam("size", 101)
+        .when()
+        .get("/villages/{id}/ninjas", firstVillageId)
+        .then()
+        .statusCode(400);
 
     given()
         .when()

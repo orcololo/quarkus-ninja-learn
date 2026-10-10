@@ -1,0 +1,8 @@
+info:
+  name: Search Menu Items
+  type: http
+  seq: 50
+
+http:
+  method: GET
+  url: "{{baseUrl}}/restaurants/menu-items/search?q=ramen&currency=BRL&page=0&size=20"

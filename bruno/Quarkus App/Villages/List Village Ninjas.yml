@@ -5,5 +5,5 @@ info:
 
 http:
   method: GET
-  url: "{{baseUrl}}/villages/{{villageId}}/ninjas"
+  url: "{{baseUrl}}/villages/{{villageId}}/ninjas?page=0&size=20"
   auth: inherit

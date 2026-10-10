@@ -44,3 +44,9 @@ vars:
   - name: reviewId
     value: "1"
     type: string
+  - name: menuItemId
+    value: "1"
+    type: string
+  - name: reindexJobId
+    value: "1"
+    type: string

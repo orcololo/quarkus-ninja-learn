@@ -2,6 +2,7 @@ package org.acme.ninjas;
 
 import java.util.List;
 
+import org.acme.dto.PageResponseDto;
 import org.acme.ninjas.dto.CreateNinjaRequest;
 import org.acme.ninjas.dto.NinjaResponseDto;
 import org.acme.ninjas.mapper.NinjaMapper;
@@ -42,10 +43,11 @@ public class NinjaService {
     return ninjaMapper.toResponse(ninja);
   }
 
-  public List<NinjaResponseDto> getAllNinjas() {
-    return ninjaRepository.listAll().stream()
+  public PageResponseDto<NinjaResponseDto> getAllNinjas(int page, int size) {
+    List<NinjaResponseDto> items = ninjaRepository.listPage(page, size).stream()
         .map(ninjaMapper::toResponse)
         .toList();
+    return new PageResponseDto<>(items, page, size, ninjaRepository.count());
   }
 
   public NinjaResponseDto getNinja(Long id) {

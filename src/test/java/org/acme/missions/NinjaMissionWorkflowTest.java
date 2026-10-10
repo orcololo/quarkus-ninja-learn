@@ -62,7 +62,8 @@ class NinjaMissionWorkflowTest {
         .get("/ninja-missions/submitted")
         .then()
         .statusCode(200)
-        .body("find { it.id == %d }.status".formatted(assignmentId), equalTo("SUBMITTED"));
+        .body("items.find { it.id == %d }.status".formatted(assignmentId), equalTo("SUBMITTED"))
+        .body("total", equalTo(1));
 
     long transactionId = ((Number) given()
         .when()
@@ -237,6 +238,20 @@ class NinjaMissionWorkflowTest {
         .queryParam("size", 101)
         .when()
         .get("/ninjas/" + NINJA_ID + "/points")
+        .then()
+        .statusCode(400);
+
+    given()
+        .queryParam("size", 101)
+        .when()
+        .get("/missions")
+        .then()
+        .statusCode(400);
+
+    given()
+        .queryParam("page", -1)
+        .when()
+        .get("/ninja-missions/submitted")
         .then()
         .statusCode(400);
   }

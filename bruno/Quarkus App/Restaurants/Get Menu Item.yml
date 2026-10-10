@@ -1,0 +1,8 @@
+info:
+  name: Get Menu Item
+  type: http
+  seq: 47
+
+http:
+  method: GET
+  url: "{{baseUrl}}/restaurants/{{restaurantId}}/menu-items/{{menuItemId}}"

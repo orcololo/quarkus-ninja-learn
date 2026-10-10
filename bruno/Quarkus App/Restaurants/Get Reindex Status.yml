@@ -1,0 +1,12 @@
+info:
+  name: Get Reindex Status
+  type: http
+  seq: 51
+
+http:
+  method: GET
+  url: "{{baseUrl}}/restaurants/reindex/{{reindexJobId}}"
+  headers:
+    - name: Authorization
+      value: "******"
+  auth: inherit

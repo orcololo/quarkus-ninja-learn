@@ -15,7 +15,8 @@ import org.testcontainers.utility.DockerImageName;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 
 public class RestaurantSearchTestResource implements QuarkusTestResourceLifecycleManager {
-  private static final String INDEX = "restaurants";
+  private static final String INDEX = RestaurantSearchIndex.INDEX;
+  private static final String MENU_INDEX = RestaurantSearchIndex.MENU_INDEX;
   private static final HttpClient HTTP = HttpClient.newHttpClient();
   private final GenericContainer<?> elasticsearch = createContainer();
 
@@ -47,21 +48,25 @@ public class RestaurantSearchTestResource implements QuarkusTestResourceLifecycl
   }
 
   static void reset() {
-    HttpResponse<String> response = send("POST", "/" + INDEX + "/_delete_by_query?refresh=true",
-        "{\"query\":{\"match_all\":{}}}");
-    if (response.statusCode() != 200 && response.statusCode() != 404) {
-      throw new IllegalStateException(
-          "Could not clear Elasticsearch test index (HTTP " + response.statusCode() + "): "
-              + response.body());
+    for (String index : new String[] {INDEX, MENU_INDEX}) {
+      HttpResponse<String> response = send("POST", "/" + index + "/_delete_by_query?refresh=true",
+          "{\"query\":{\"match_all\":{}}}");
+      if (response.statusCode() != 200 && response.statusCode() != 404) {
+        throw new IllegalStateException(
+            "Could not clear Elasticsearch test index (HTTP " + response.statusCode() + "): "
+                + response.body());
+      }
     }
   }
 
   static void refresh() {
-    HttpResponse<String> response = send("POST", "/" + INDEX + "/_refresh", "");
-    if (response.statusCode() != 200) {
-      throw new IllegalStateException(
-          "Could not refresh Elasticsearch test index (HTTP " + response.statusCode() + "): "
-              + response.body());
+    for (String index : new String[] {INDEX, MENU_INDEX}) {
+      HttpResponse<String> response = send("POST", "/" + index + "/_refresh", "");
+      if (response.statusCode() != 200 && response.statusCode() != 404) {
+        throw new IllegalStateException(
+            "Could not refresh Elasticsearch test index (HTTP " + response.statusCode() + "): "
+                + response.body());
+      }
     }
   }
 

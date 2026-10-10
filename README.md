@@ -36,8 +36,8 @@ You can run your application in dev mode that enables live coding using:
 > **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
 
 Flyway applies versioned SQL migrations from `src/main/resources/db/migration`.
-Development and test profiles clean and recreate their schema at startup; do not
-use those profiles or the clean setting with persistent data.
+The test profile cleans and recreates its schema at startup. Development mode
+preserves application data and applies only pending migrations.
 
 For an existing database created before Flyway was introduced, verify that its
 schema matches migration V1 and baseline it at version 1 before starting the
@@ -45,7 +45,10 @@ application. New databases run V1 and subsequent migrations automatically.
 
 ## Missions and points
 
-Villages support create/list/get/update/delete at `/villages`. Set or clear a
+Villages support create/list/get/update/delete at `/villages`. Collection
+endpoints (including Ninja, mission, village-member, submitted-mission, and
+menu-item lists) use `page` and `size` (defaults 0 and 20, maximum size 100)
+and return `items`, `page`, `size`, and `total`. Set or clear a
 leader with `PUT` or `DELETE /villages/{id}/leader`; add/move or remove a Ninja
 with `PUT` or `DELETE /villages/{id}/ninjas/{ninjaId}`, and list members at
 `GET /villages/{id}/ninjas`. A village leader is also a member and counts
@@ -112,8 +115,8 @@ Restaurants and reviews are stored in PostgreSQL. Restaurant create, update,
 delete, and review writes also add a search-indexing event in the same database
 transaction. A scheduled backend worker sends events to Elasticsearch in bulk,
 without holding a database transaction during network calls; failed batches
-remain queued for retry. Reindexing queues restaurants in bounded database
-pages. Search criteria, including coordinates and radius in kilometers, are
+remain queued for retry. Reindexing starts a durable background job that scans
+restaurants and menu items in bounded database pages. Search criteria, including coordinates and radius in kilometers, are
 sent to Elasticsearch by the backend; results are then loaded from PostgreSQL,
 which remains the source of truth. Restaurant search keeps exact result totals,
 so broad searches still require Elasticsearch to count every match.
@@ -123,10 +126,23 @@ guide, see the [restaurant locator documentation](docs/restaurant-locator.md).
 
 Start Elasticsearch with `docker compose up -d elasticsearch` and configure
 `ELASTICSEARCH_URL` and `ELASTICSEARCH_API_KEY` in production. Restaurant
-management and reindexing require `mission-admin`; search, restaurant reads, and
-review reads are public. Any authenticated OIDC identity can submit one review
-per restaurant. Use `POST /restaurants/reindex` to queue current restaurants
-for indexing again.
+creation/updates and reindexing require `mission-admin`; an authenticated owner
+can delete their restaurant or menu item, while `mission-admin` can delete
+across owners, including legacy resources without an owner. Search, restaurant
+reads, and review reads are public. Any authenticated OIDC identity can submit
+one review per restaurant. Use `POST /restaurants/reindex` to start a reindex job and
+`GET /restaurants/reindex/{jobId}` to poll its progress.
+
+Restaurant menus are managed with `GET/POST /restaurants/{id}/menu-items` and
+`GET/PUT/DELETE /restaurants/{id}/menu-items/{itemId}`. Menu reads are public;
+menu creation and updates require `mission-admin`; deletion is owner-checked as
+described above. Each item has a price and ISO currency code, optional
+category/description, and availability flag. Menu listing
+accepts `page` and `size` and returns a page envelope. See the
+[restaurant locator guide](docs/restaurant-locator.md) for request details.
+Search menu items across restaurants with
+`GET /restaurants/menu-items/search?q=...&category=...&available=true`; each
+search result includes the item and current restaurant metadata.
 
 The restaurant integration tests start Elasticsearch 8.17.4 with Testcontainers;
 Docker must be available when running `./mvnw test`. The first run downloads the

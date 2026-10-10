@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: "{{baseUrl}}/ninja-missions/submitted"
+  url: "{{baseUrl}}/ninja-missions/submitted?page=0&size=20"
   headers:
     - name: Authorization
       value: "Bearer {{adminToken}}"

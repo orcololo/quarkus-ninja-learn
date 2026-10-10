@@ -1,0 +1,34 @@
+info:
+  name: Create Menu Item
+  type: http
+  seq: 46
+
+http:
+  method: POST
+  url: "{{baseUrl}}/restaurants/{{restaurantId}}/menu-items"
+  headers:
+    - name: Authorization
+      value: "******"
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Shoyu Ramen",
+        "description": "Pork broth ramen with noodles",
+        "category": "Mains",
+        "price": 14.5,
+        "currency": "USD",
+        "available": true
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status !== 201 || typeof res.body?.id !== "number") {
+          throw new Error(`Menu item creation failed (${res.status})`);
+        }
+        bru.setEnvVar("menuItemId", String(res.body.id));

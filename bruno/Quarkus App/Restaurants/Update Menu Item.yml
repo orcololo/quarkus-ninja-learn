@@ -1,0 +1,25 @@
+info:
+  name: Update Menu Item
+  type: http
+  seq: 48
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/restaurants/{{restaurantId}}/menu-items/{{menuItemId}}"
+  headers:
+    - name: Authorization
+      value: "******"
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Vegan Shoyu Ramen",
+        "description": "Plant-based broth ramen with noodles",
+        "category": "Mains",
+        "price": 15.25,
+        "currency": "USD",
+        "available": false
+      }
+  auth: inherit

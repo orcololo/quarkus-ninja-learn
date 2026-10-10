@@ -2,6 +2,7 @@ package org.acme.missions;
 
 import java.util.List;
 
+import org.acme.dto.PageResponseDto;
 import org.acme.missions.dto.CreateMissionRequest;
 import org.acme.missions.dto.MissionResponseDto;
 import org.acme.missions.dto.UpdateMissionRequest;
@@ -28,8 +29,11 @@ public class MissionService {
     return missionMapper.toResponse(mission);
   }
 
-  public List<MissionResponseDto> list() {
-    return missionRepository.listAll().stream().map(missionMapper::toResponse).toList();
+  public PageResponseDto<MissionResponseDto> list(int page, int size) {
+    List<MissionResponseDto> items = missionRepository.listPage(page, size).stream()
+        .map(missionMapper::toResponse)
+        .toList();
+    return new PageResponseDto<>(items, page, size, missionRepository.count());
   }
 
   public MissionResponseDto get(Long id) {

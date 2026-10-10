@@ -1,0 +1,12 @@
+info:
+  name: Delete Menu Item
+  type: http
+  seq: 49
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/restaurants/{{restaurantId}}/menu-items/{{menuItemId}}"
+  headers:
+    - name: Authorization
+      value: "******"
+  auth: inherit

@@ -19,8 +19,20 @@ http:
         "description": "Ramen and Japanese comfort food",
         "address": "1 Market Street",
         "city": "San Francisco",
-        "cuisine": "Japanese",
+        "cuisine": "JAPANESE",
         "latitude": 37.7936,
-        "longitude": -122.3965
+        "longitude": -122.3965,
+        "openingHours": {
+          "timeZone": "America/Los_Angeles",
+          "periods": [
+            {"dayOfWeek": "MONDAY", "opensAt": "11:00", "closesAt": "22:00"},
+            {"dayOfWeek": "TUESDAY", "opensAt": "11:00", "closesAt": "22:00"},
+            {"dayOfWeek": "WEDNESDAY", "opensAt": "11:00", "closesAt": "22:00"},
+            {"dayOfWeek": "THURSDAY", "opensAt": "11:00", "closesAt": "22:00"},
+            {"dayOfWeek": "FRIDAY", "opensAt": "11:00", "closesAt": "23:00"},
+            {"dayOfWeek": "SATURDAY", "opensAt": "10:00", "closesAt": "23:00"},
+            {"dayOfWeek": "SUNDAY", "opensAt": "10:00", "closesAt": "21:00"}
+          ]
+        }
       }
   auth: inherit
