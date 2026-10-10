@@ -1,0 +1,12 @@
+info:
+  name: Submit Mission
+  type: http
+  seq: 33
+
+http:
+  method: POST
+  url: "{{baseUrl}}/ninja-missions/{{assignmentId}}/submit"
+  headers:
+    - name: Authorization
+      value: "Bearer {{ninjaToken}}"
+  auth: inherit

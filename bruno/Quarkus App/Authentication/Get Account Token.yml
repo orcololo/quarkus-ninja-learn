@@ -1,0 +1,39 @@
+info:
+  name: Get Account Token
+  type: http
+  seq: 17
+
+http:
+  method: POST
+  url: "{{keycloakUrl}}/realms/ninja/protocol/openid-connect/token"
+  headers:
+    - name: Content-Type
+      value: application/x-www-form-urlencoded
+  body:
+    type: form-urlencoded
+    data:
+      - name: client_id
+        value: ninja-api
+      - name: grant_type
+        value: password
+      - name: username
+        value: "{{accountUsername}}"
+      - name: password
+        value: "{{accountPassword}}"
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status !== 200 || typeof res.body?.access_token !== "string") {
+          throw new Error(`Account login failed (${res.status})`);
+        }
+        bru.setEnvVar("accountToken", res.body.access_token);
+        console.log("Account token saved for this Bruno session.");
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

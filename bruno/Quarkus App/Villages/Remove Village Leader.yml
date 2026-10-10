@@ -1,0 +1,12 @@
+info:
+  name: Remove Village Leader
+  type: http
+  seq: 11
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/villages/{{villageId}}/leader"
+  headers:
+    - name: Authorization
+      value: "Bearer {{adminToken}}"
+  auth: inherit

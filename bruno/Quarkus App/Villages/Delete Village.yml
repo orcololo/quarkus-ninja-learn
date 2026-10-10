@@ -1,0 +1,12 @@
+info:
+  name: Delete Village
+  type: http
+  seq: 9
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/villages/{{villageId}}"
+  headers:
+    - name: Authorization
+      value: "Bearer {{adminToken}}"
+  auth: inherit

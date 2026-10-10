@@ -1,0 +1,12 @@
+info:
+  name: Unlink Ninja from Account
+  type: http
+  seq: 23
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/users/{{userId}}/ninjas/{{ninjaId}}"
+  headers:
+    - name: Authorization
+      value: "Bearer {{adminToken}}"
+  auth: inherit

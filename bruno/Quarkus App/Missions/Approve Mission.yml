@@ -1,0 +1,12 @@
+info:
+  name: Approve Mission
+  type: http
+  seq: 34
+
+http:
+  method: POST
+  url: "{{baseUrl}}/ninja-missions/{{assignmentId}}/approve"
+  headers:
+    - name: Authorization
+      value: "Bearer {{adminToken}}"
+  auth: inherit

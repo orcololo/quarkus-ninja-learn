@@ -1,0 +1,12 @@
+info:
+  name: Link Ninja to Account
+  type: http
+  seq: 22
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/users/{{userId}}/ninjas/{{ninjaId}}"
+  headers:
+    - name: Authorization
+      value: "Bearer {{adminToken}}"
+  auth: inherit

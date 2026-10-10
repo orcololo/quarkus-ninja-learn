@@ -1,0 +1,22 @@
+info:
+  name: Create Mission
+  type: http
+  seq: 24
+
+http:
+  method: POST
+  url: "{{baseUrl}}/missions"
+  headers:
+    - name: Authorization
+      value: "Bearer {{adminToken}}"
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "title": "Deliver a scroll",
+        "description": "Deliver the sealed scroll to the Hokage.",
+        "points": 25
+      }
+  auth: inherit

@@ -1,0 +1,12 @@
+info:
+  name: List Game Accounts
+  type: http
+  seq: 20
+
+http:
+  method: GET
+  url: "{{baseUrl}}/users?page=0&size=20"
+  headers:
+    - name: Authorization
+      value: "Bearer {{adminToken}}"
+  auth: inherit

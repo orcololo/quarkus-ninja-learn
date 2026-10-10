@@ -1,0 +1,26 @@
+info:
+  name: Create Ninja
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{baseUrl}}/ninjas"
+  headers:
+    - name: Authorization
+      value: "Bearer {{adminToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Naruto",
+        "age": 13,
+        "level": "BEGINNER"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

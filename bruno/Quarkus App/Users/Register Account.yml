@@ -1,0 +1,40 @@
+info:
+  name: Register Account
+  type: http
+  seq: 16
+
+http:
+  method: POST
+  url: "{{baseUrl}}/users/register"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "username": "{{accountUsername}}",
+        "email": "{{accountEmail}}",
+        "password": "{{accountPassword}}"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 409) {
+          throw new Error("That username or email is already registered. Update accountUsername/accountEmail in the Local environment.");
+        }
+        if (res.status === 502) {
+          throw new Error("Keycloak account provisioning failed. Check the ninja-provisioner client and its manage-users/view-realm roles; see the collection README.");
+        }
+        if (res.status !== 201) {
+          throw new Error(`Account registration failed (${res.status})`);
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

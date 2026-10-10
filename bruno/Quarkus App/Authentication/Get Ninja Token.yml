@@ -1,0 +1,39 @@
+info:
+  name: Get Ninja Token
+  type: http
+  seq: 7
+
+http:
+  method: POST
+  url: "{{keycloakUrl}}/realms/ninja/protocol/openid-connect/token"
+  headers:
+    - name: Content-Type
+      value: application/x-www-form-urlencoded
+  body:
+    type: form-urlencoded
+    data:
+      - name: client_id
+        value: ninja-api
+      - name: grant_type
+        value: password
+      - name: username
+        value: "{{ninjaId}}"
+      - name: password
+        value: ninja123
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status !== 200 || typeof res.body?.access_token !== "string") {
+          throw new Error(`Keycloak Ninja login failed (${res.status})`);
+        }
+        bru.setEnvVar("ninjaToken", res.body.access_token);
+        console.log("Ninja token saved for this Bruno session.");
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

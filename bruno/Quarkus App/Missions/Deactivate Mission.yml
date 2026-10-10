@@ -1,0 +1,12 @@
+info:
+  name: Deactivate Mission
+  type: http
+  seq: 29
+
+http:
+  method: POST
+  url: "{{baseUrl}}/missions/{{missionId}}/deactivate"
+  headers:
+    - name: Authorization
+      value: "Bearer {{adminToken}}"
+  auth: inherit

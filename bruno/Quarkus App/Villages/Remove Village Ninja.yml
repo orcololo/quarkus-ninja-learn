@@ -1,0 +1,12 @@
+info:
+  name: Remove Village Ninja
+  type: http
+  seq: 14
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/villages/{{villageId}}/ninjas/{{ninjaId}}"
+  headers:
+    - name: Authorization
+      value: "Bearer {{adminToken}}"
+  auth: inherit

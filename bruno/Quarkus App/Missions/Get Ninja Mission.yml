@@ -1,0 +1,12 @@
+info:
+  name: Get Ninja Mission
+  type: http
+  seq: 32
+
+http:
+  method: GET
+  url: "{{baseUrl}}/ninja-missions/{{assignmentId}}"
+  headers:
+    - name: Authorization
+      value: "Bearer {{ninjaToken}}"
+  auth: inherit

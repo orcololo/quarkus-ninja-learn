@@ -1,0 +1,18 @@
+info:
+  name: Assign Village Leader
+  type: http
+  seq: 10
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/villages/{{villageId}}/leader"
+  headers:
+    - name: Authorization
+      value: "Bearer {{adminToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "ninjaId": {{ninjaId}}
+      }
+  auth: inherit

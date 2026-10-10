@@ -1,0 +1,28 @@
+info:
+  name: Create Village
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{baseUrl}}/villages"
+  headers:
+    - name: Authorization
+      value: "Bearer {{adminToken}}"
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Leaf",
+        "location": "Japan",
+        "description": "The hidden village of the leaf hold many mysteries",
+        "type": "HIDDEN"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

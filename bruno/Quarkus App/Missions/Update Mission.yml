@@ -1,0 +1,22 @@
+info:
+  name: Update Mission
+  type: http
+  seq: 27
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/missions/{{missionId}}"
+  headers:
+    - name: Authorization
+      value: "Bearer {{adminToken}}"
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "title": "Deliver the sealed scroll",
+        "description": "Deliver the sealed scroll to the Hokage.",
+        "points": 30
+      }
+  auth: inherit

@@ -1,0 +1,12 @@
+info:
+  name: Activate Mission
+  type: http
+  seq: 28
+
+http:
+  method: POST
+  url: "{{baseUrl}}/missions/{{missionId}}/activate"
+  headers:
+    - name: Authorization
+      value: "Bearer {{adminToken}}"
+  auth: inherit

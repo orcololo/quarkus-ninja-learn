@@ -1,0 +1,12 @@
+info:
+  name: Assign Village Ninja
+  type: http
+  seq: 13
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/villages/{{villageId}}/ninjas/{{ninjaId}}"
+  headers:
+    - name: Authorization
+      value: "Bearer {{adminToken}}"
+  auth: inherit

@@ -1,0 +1,9 @@
+info:
+  name: Get Mission
+  type: http
+  seq: 26
+
+http:
+  method: GET
+  url: "{{baseUrl}}/missions/{{missionId}}"
+  auth: inherit

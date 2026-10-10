@@ -1,0 +1,20 @@
+info:
+  name: Update Account Level
+  type: http
+  seq: 21
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/users/{{userId}}/level"
+  headers:
+    - name: Authorization
+      value: "Bearer {{adminToken}}"
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "level": "PREMIUM"
+      }
+  auth: inherit

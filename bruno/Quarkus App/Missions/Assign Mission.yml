@@ -1,0 +1,12 @@
+info:
+  name: Assign Mission
+  type: http
+  seq: 30
+
+http:
+  method: POST
+  url: "{{baseUrl}}/ninjas/{{ninjaId}}/missions/{{missionId}}"
+  headers:
+    - name: Authorization
+      value: "Bearer {{adminToken}}"
+  auth: inherit

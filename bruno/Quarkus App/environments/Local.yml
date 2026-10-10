@@ -1,0 +1,40 @@
+vars:
+  - name: baseUrl
+    value: http://localhost:8080
+    type: string
+  - name: keycloakUrl
+    value: http://localhost:8180
+    type: string
+  - name: adminToken
+    value: ""
+    type: string
+  - name: ninjaToken
+    value: ""
+    type: string
+  - name: accountToken
+    value: ""
+    type: string
+  - name: accountUsername
+    value: new-player
+    type: string
+  - name: accountEmail
+    value: new-player@example.invalid
+    type: string
+  - name: accountPassword
+    value: change-this-password
+    type: string
+  - name: userId
+    value: "1"
+    type: string
+  - name: missionId
+    value: "1"
+    type: string
+  - name: assignmentId
+    value: "1"
+    type: string
+  - name: villageId
+    value: "1"
+    type: string
+  - name: ninjaId
+    value: "1"
+    type: string

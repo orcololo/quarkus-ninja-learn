@@ -1,0 +1,12 @@
+info:
+  name: Reject Mission
+  type: http
+  seq: 35
+
+http:
+  method: POST
+  url: "{{baseUrl}}/ninja-missions/{{assignmentId}}/reject"
+  headers:
+    - name: Authorization
+      value: "Bearer {{adminToken}}"
+  auth: inherit
